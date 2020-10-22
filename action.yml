@@ -1,0 +1,7 @@
+name: "Issues to posts"
+description: "Turn issues into post markdown files"
+runs:
+  using: "composite"
+  steps:
+    - run: ${{ github.action_path }}/issue2post.sh
+      shell: bash
