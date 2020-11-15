@@ -36,7 +36,8 @@ jobs:
         name: Turn comment into file
         shell: bash
         run: |
-          FILE_NAME=_posts/"${DATE:0:10}-${{ github.event.issue.title }}".md
+          FILE_NAME="${DATE:0:10}-${{ github.event.issue.title }}"
+          FILE_NAME_WITH_PATH=_posts/$FILE_NAME.md
           DATE="${{ github.event.issue.created_at }}"
           cat <<'EOF' > $FILE_NAME
           ---
@@ -46,7 +47,7 @@ jobs:
           ---
           ${{ github.event.issue.body }}
           EOF
-          echo "::set-output name=markdown-file::$(echo $FILE_NAME)"
+          echo "::set-output name=markdown-file::$(echo $FILE_NAME_WITH_PATH)"
 
       - name: Push changes to repo
         shell: bash
