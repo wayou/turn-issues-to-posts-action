@@ -10,7 +10,21 @@ inputs:
     description: "Target branch name to push the markdownfile"
     required: true
     default: "master"
-
+  GITHUB_TOKEN:
+    description: "secrets.GITHUB_TOKEN"
+    required: true
+  created_at:
+    description: "github.event.issue.created_at"
+    required: true
+  title:
+    description: "github.event.issue.title"
+    required: true
+  body:
+    description: "github.event.issue.body"
+    required: true
+  actor:
+    description: "github.actor"
+    required: true
 outputs:
   markdown-file:
     description: "The generated markdown file"
@@ -18,13 +32,29 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
     - id: generate-markdown-file
       name: Turn comment into file
       shell: bash
-      run: ${{ github.action_path }}/generate-markdown-file.sh
-
+      run: |
+        DATE="${{ inputs.created_at }}"
+        cat <<'EOF' > _posts/${DATE:0:10}-${{ inputs.title }}.md
+        ---
+        layout: post
+        title: ${{ inputs.title }}
+        date: ${{ inputs.created_at }}
+        ---
+        ${{ inputs.body }}
+        EOF
+        echo "::set-output name=markdown-file::$(echo ${{ inputs.body }})"
     - name: Push changes to repo
       shell: bash
-      run: ${{ github.action_path }}/push.sh
+      run: |
+        REMOTE=https://${{ inputs.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+        git config user.email "${{ inputs.actor }}@users.noreply.github.com"
+        git config user.name "${{ inputs.actor }}"
+        git pull ${REMOTE}
+        git checkout ${{ inputs.branch-name }}
+        git add .
+        git status
+        git commit -am "Add new comment"
+        git push ${REMOTE} ${{ inputs.branch-name }}
