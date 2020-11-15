@@ -29,10 +29,6 @@ inputs:
   actor:
     description: "github.actor"
     required: true
-outputs:
-  markdown-file:
-    description: "The generated markdown file"
-    value: ${{ steps.random-number-generator.outputs.markdown-file }}
 runs:
   using: "composite"
   steps:
@@ -50,7 +46,6 @@ runs:
         ---
         ${{ inputs.body }}
         EOF
-        echo "::set-output name=markdown-file::$(echo ${{ inputs.title }})"
     - name: Push changes to repo
       shell: bash
       run: |
