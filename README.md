@@ -6,7 +6,7 @@ Github action which turn issues into post markdown files
 
 add `.github/workflows/main.yml` with following content:
 
-```sh
+```yaml
 name: generate my blog posts
 on:
   issues:
