@@ -34,26 +34,9 @@ jobs:
       - uses: actions/checkout@v2
       - id: generate-markdown-file
         name: Turn comment into file
-        run: |
-          DATE="${{ github.event.issue.created_at }}"
-          cat <<'EOF' > _posts/${DATE:0:10}-${{ github.event.issue.title }}.md
-          ---
-          layout: post
-          title: ${{ github.event.issue.title }}
-          date: ${{ github.event.issue.created_at }}
-          ---
-          ${{ github.event.issue.body }}
-          EOF
-          echo "::set-output name=markdown-file::$(echo 0)"
+        shell: bash
+        run: ${{ github.action_path }}/generate-markdown-file.sh
 
       - name: Push changes to repo
-        run: |
-          REMOTE=https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git config user.name "${{ github.actor }}"
-          git pull ${REMOTE}
-          git checkout ${{ inputs.branch-name }}
-          git add .
-          git status
-          git commit -am "Add new comment"
-          git push ${REMOTE} ${{ inputs.branch-name }}
+        shell: bash
+        run: ${{ github.action_path }}/push.sh
