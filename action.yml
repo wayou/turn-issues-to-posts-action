@@ -1,32 +1,62 @@
-# the official doc:
-# https://docs.github.com/en/free-pro-team@latest/actions/creating-actions/creating-a-composite-run-steps-action
+# https://www.freecodecamp.org/news/publishing-github-event-data-with-github-actions-and-pages/
+# https://stackoverflow.com/questions/58597010/how-to-access-a-github-issue-comment-body-using-github-actions
+# This is a basic workflow to help you get started with Actions
+# https://github.com/maguowei/iaas/blob/d48834c18b66ae0f3ae32e5e62a6811dfddadcb2/.github/workflows/iaas.yml
 
-# name: "Issues to posts"
-# description: "Turn issues into post markdown files"
-# runs:
-#   using: "composite"
-#   steps:
-#     - run: ${{ github.action_path }}/issue2post.sh
-#       shell: bash
-
-name: "Hello World"
-description: "Greet someone"
+name: issue2post
+description: "Turn issues into markdown file"
 inputs:
-  who-to-greet:
-    description: "Who to greet"
+  branch-name:
+    description: "Target branch name to push the markdownfile"
     required: true
-    default: "World"
+    default: "master"
+
 outputs:
-  random-number:
-    description: "Random number"
+  markdown-file:
+    description: "The generated markdown file"
     value: ${{ steps.random-number-generator.outputs.random-id }}
-runs:
-  using: "composite"
-  steps:
-    - run: echo Hello ${{ inputs.who-to-greet }}.
-      shell: bash
-    - id: random-number-generator
-      run: echo "::set-output name=random-id::$(echo $RANDOM)"
-      shell: bash
-    - run: ${{ github.action_path }}/goodbye.sh
-      shell: bash
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  issues:
+    types: [opened, edited]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  run:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - id: generate-markdown-file
+        name: Turn comment into file
+        shell: bash
+        run: |
+          FILE_NAME=_posts/"${DATE:0:10}-${{ github.event.issue.title }}".md
+          DATE="${{ github.event.issue.created_at }}"
+          cat <<'EOF' > $FILE_NAME
+          ---
+          layout: post
+          title: ${{ github.event.issue.title }}
+          date: ${{ github.event.issue.created_at }}
+          ---
+          ${{ github.event.issue.body }}
+          EOF
+          echo "::set-output name=markdown-file::$(echo $FILE_NAME)"
+
+      - name: Push changes to repo
+        shell: bash
+        run: |
+          REMOTE=https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git pull ${REMOTE}
+          git checkout ${{ inputs.branch-name }}
+          git add .
+          git status
+          git commit -am "Add new comment"
+          git push ${REMOTE} ${{ inputs.branch-name }}
