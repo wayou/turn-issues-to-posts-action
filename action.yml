@@ -6,10 +6,14 @@
 name: issue2post
 description: "Turn issues into markdown file"
 inputs:
-  branch-name:
+  branch:
     description: "Target branch name to push the markdownfile"
     required: true
     default: "master"
+  dir:
+    description: "the posts dir"
+    required: true
+    default: "_posts"
   GITHUB_TOKEN:
     description: "secrets.GITHUB_TOKEN"
     required: true
@@ -37,6 +41,7 @@ runs:
       shell: bash
       run: |
         DATE="${{ inputs.created_at }}"
+        mkdir -p ${{ inputs.dir }}
         cat <<'EOF' > _posts/${DATE:0:10}-${{ inputs.title }}.md
         ---
         layout: post
@@ -53,8 +58,8 @@ runs:
         git config user.email "${{ inputs.actor }}@users.noreply.github.com"
         git config user.name "${{ inputs.actor }}"
         git pull ${REMOTE}
-        git checkout ${{ inputs.branch-name }}
+        git checkout ${{ inputs.branch }}
         git add .
         git status
         git commit -am "Add new comment"
-        git push ${REMOTE} ${{ inputs.branch-name }}
+        git push ${REMOTE} ${{ inputs.branch }}
