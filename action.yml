@@ -5,6 +5,9 @@
 
 name: issue2post
 description: "Turn issues into markdown file"
+branding:
+  icon: "archive"
+  color: "green"
 inputs:
   branch:
     description: "Target branch name to push the markdownfile"
