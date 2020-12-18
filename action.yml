@@ -41,7 +41,7 @@ runs:
       run: |
         DATE="${{ inputs.created_at }}"
         mkdir -p ${{ inputs.dir }}
-        cat <<'EOF' > _posts/"${DATE:0:10}-${{ github.event.issue.title }}".md
+        cat <<'EOF' > _posts/"${DATE:0:10}-${{ inputs.title }}".md
         ---
         layout: post
         title: ${{ inputs.title }}
