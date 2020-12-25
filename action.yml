@@ -38,21 +38,7 @@ runs:
     - id: generate-markdown-file
       name: Turn comment into file
       shell: bash
-      run: |
-        DATE="${{ inputs.created_at }}"
-        mkdir -p ${{ inputs.dir }}
-        function sanitize_file_name {
-          echo -n $1 | perl -pe 's/[\?\[\]\/\\=<>:;,''"&\$#*()|~`!{}%+]//g;' -pe 's/[\r\n\t -]+/-/g;'
-        }
-        FILE_TITLE = sanitize_file_name ${{ inputs.title }}
-        cat <<'EOF' > _posts/"${DATE:0:10}-${FILE_TITLE}".md
-        ---
-        layout: post
-        title: ${{ inputs.title }}
-        date: ${{ inputs.created_at }}
-        ---
-        ${{ inputs.body }}
-        EOF
+      run: ./gen_post.sh
     - name: Push changes to repo
       shell: bash
       run: |
