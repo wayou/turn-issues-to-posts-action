@@ -44,8 +44,8 @@ runs:
         function sanitize_file_name {
           echo -n $1 | perl -pe 's/[\?\[\]\/\\=<>:;,''"&\$#*()|~`!{}%+]//g;' -pe 's/[\r\n\t -]+/-/g;'
         }
-        filename = sanitize_file_name ${{ inputs.title }}
-        cat <<'EOF' > _posts/"${DATE:0:10}-${filename}".md
+        FILE_TITLE = sanitize_file_name ${{ inputs.title }}
+        cat <<'EOF' > _posts/"${DATE:0:10}-${FILE_TITLE}".md
         ---
         layout: post
         title: ${{ inputs.title }}
