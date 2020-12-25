@@ -41,7 +41,11 @@ runs:
       run: |
         DATE="${{ inputs.created_at }}"
         mkdir -p ${{ inputs.dir }}
-        cat <<'EOF' > _posts/"${DATE:0:10}-${{ inputs.title }}".md
+        function sanitize_file_name {
+          echo -n $1 | perl -pe 's/[\?\[\]\/\\=<>:;,''"&\$#*()|~`!{}%+]//g;' -pe 's/[\r\n\t -]+/-/g;'
+        }
+        filename = sanitize_file_name ${{ inputs.title }}
+        cat <<'EOF' > _posts/"${DATE:0:10}-${filename}".md
         ---
         layout: post
         title: ${{ inputs.title }}
