@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: wayou/turn-issues-to-posts-action@v1
+      - uses: wayou/turn-issues-to-posts-action@v1.2.5
         with:
           branch: "master" # default to master
           dir: "_posts" # default to _posts
