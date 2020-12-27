@@ -38,7 +38,18 @@ runs:
     - id: generate-markdown-file
       name: Turn comment into file
       shell: bash
-      run: ./gen_post.sh
+      run: |
+        DATE="${{ inputs.created_at }}"
+        mkdir -p ${{ inputs.dir }}
+        POST_TITLE=$(sed -E 's/[[:space:]|[:punct:]]/_/g' <<<"${{ inputs.title }}")
+        cat <<'EOF' > _posts/"${DATE:0:10}-${POST_TITLE}".md
+        ---
+        layout: post
+        title: ${{ inputs.title }}
+        date: ${{ inputs.created_at }}
+        ---
+        ${{ inputs.body }}
+        EOF
     - name: Push changes to repo
       shell: bash
       run: |
