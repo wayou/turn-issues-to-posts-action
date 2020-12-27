@@ -2,6 +2,7 @@
 # https://stackoverflow.com/questions/58597010/how-to-access-a-github-issue-comment-body-using-github-actions
 # This is a basic workflow to help you get started with Actions
 # https://github.com/maguowei/iaas/blob/d48834c18b66ae0f3ae32e5e62a6811dfddadcb2/.github/workflows/iaas.yml
+# replace invalid characters in filename https://stackoverflow.com/a/50876753/1553656
 
 name: issue2post
 description: "Turn issues into markdown file"
